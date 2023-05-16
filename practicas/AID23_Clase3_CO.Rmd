@@ -1,0 +1,348 @@
+---
+title: "AID Clase 3"
+author: "Cecilia Oliva"
+date: "15/04/2023"
+output:
+   html_document:
+     toc: yes
+     code_folding: show
+     toc_float: yes
+     df_print: paged
+     theme: united
+     code_download: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+<br>
+<br>
+
+# Tests de Independencia y Homogeneidad
+
+<br>
+<br>
+
+## <span style="color:darkred">Test de Independencia</span>
+
+<br>
+
+Supongamos que queremos saber si existe relación entre el estado civil de un grupo de personas, y
+su nivel de stress.
+
+H0: el estado civil es independiente del nivel de stress (para todo i y j $P(X=x_i,Y=y_j)=P(X=x_i).P(Y=y_j)$ i= 1, 2, 3; j= 1, 2).
+
+H1: las variables no son independientes (existe al menos algún par i y j tal que $P(X=x_i,Y=y_j)\neq P(X=x_i).P(Y=y_j)$ i= 1, 2, 3; j= 1, 2).
+
+Contamos con los datos de la siguiente tabla:
+<br>
+```{r echo=TRUE}
+CantStressBajo<-c(155,204,103)
+CantStressAlto<-c(100,122,183)
+Tab<-as.table(rbind(CantStressBajo,CantStressAlto))
+dimnames(Tab)<-list(Stress=c("Bajo","Alto"),EstadoCivil=c("Soltero","Casado","Divorciado"))
+Tab
+```
+<br>
+<br>
+
+### <span style="color:darkblue">Gráficos útiles</span>
+
+<br>
+
+#### Gráfico de barras adyacentes
+
+<br>
+```{r echo=TRUE}
+par(bg="lightcyan")
+barplot(Tab,beside=TRUE,col= c("aquamarine3","tan1"),ylim=c(0,280),ylab="Cantidad")
+#title("Nivel de stress según estado civil",cex=0.75)
+mtext("Nivel de stress según estado civil",cex=1,line=1)
+legend("topright",cex=0.8,title="Stress",c("Bajo","Alto"), fill=c("aquamarine3","tan1"),horiz=F, box.lty = 0)
+
+```
+<br>
+<br>
+
+#### Gráfico de mosaicos
+
+<br>
+```{r echo=TRUE}
+par(bg="lightcyan")
+mosaicplot(t(Tab),col=c("aquamarine3","tan1"),main="Nivel de stress según estado civil",ylab="Nivel de stress",xlab="Estado civil",
+           cex=0.8)
+
+```
+<br>
+<br>
+Aplicación del test Chi-cuadrado:
+<br>
+```{r echo=TRUE}
+
+
+chisq.test(Tab)
+```
+<br>
+Analizamos las subtablas de contingencia:
+<br>
+```{r echo=TRUE}
+Tab1<-Tab[,-1]
+chisq.test(Tab1)
+
+Tab2<-Tab[,-2]
+chisq.test(Tab2)
+
+Tab3<-Tab[,-3]
+chisq.test(Tab3)
+
+``` 
+<br>
+Veamos algunos outputs que devuelve el comando chisq.test:
+<br>
+```{r echo=TRUE}
+names(chisq.test(Tab))
+
+chisq.test(Tab)$statistic
+
+chisq.test(Tab)$expected
+
+chisq.test(Tab)$residuals
+
+chisq.test(Tab)$stdres
+
+chisq.test(Tab1)$statistic
+
+chisq.test(Tab1)$expected
+
+chisq.test(Tab1)$residuals
+
+chisq.test(Tab1)$stdres
+
+chisq.test(Tab2)$statistic
+
+chisq.test(Tab2)$expected
+
+chisq.test(Tab2)$residuals
+
+chisq.test(Tab2)$stdres
+
+chisq.test(Tab3)$statistic
+
+chisq.test(Tab3)$expected
+
+chisq.test(Tab3)$residuals
+
+chisq.test(Tab3)$stdres
+
+```
+<br>
+<br>
+
+## <span style="color:darkred">Test de homogeneidad</span>
+
+<br>
+Supongamos que queremos saber si existe diferencia entre el color de cabello de tres poblaciones
+pertenecientes a tres ciudades respectivamente. Contamos con los datos de la siguiente tabla:
+
+H0: el color de cabello es homogéneo en las tres poblaciones/ciudades (para todo i y j $P(X=x_i|Y=Pob_j)=P(X=x_i)$ i= 1, 2; j= 1, 2, 3).
+
+H1: el color de cabello no es homogéneo en todas las poblaciones (exite al menos algún par i y j tal que $P(X=x_i|Y=Pob_j)\neq P(X=x_i)$ i= 1, 2; j= 1, 2, 3).
+
+Contamos con los datos de la siguiente tabla:
+<br>
+```{r echo=TRUE}
+Pob1<-c(99,53)#Ciudad Norte
+Pob2<-c(105,65)#Ciudad Centro
+Pob3<-c(150,48)#Ciudad Sur
+
+TabPob<-as.table(rbind(Pob1,Pob2,Pob3))
+dimnames(TabPob)<-list(Ciudad=c("Norte","Centro","Sur"),ColorPelo=c("Rubios","Morochos"))
+TabPob
+
+```
+<br>
+<br>
+
+### <span style="color:darkblue">Gráficos útiles</span>
+
+<br>
+
+#### Gráfico de barras adyacentes
+
+<br>
+```{r echo=TRUE}
+
+par(bg="lightcyan")
+barplot(t(TabPob),beside=TRUE,col= c("gold","ivory4"),ylim=c(0,280),ylab="Cantidad",xlab="Ciudad")
+mtext("Color de pelo según ciudad",cex=1,line=1)
+legend("topright",cex=0.8,c("Rubios","Morochos"), fill=c("gold","ivory4"),horiz=F, box.lty = 0) 
+``` 
+<br>
+<br>
+
+#### Gráfico de mosaicos
+
+<br>
+```{r echo=TRUE}
+
+mosaicplot(TabPob,col=c("gold","ivory4"),main="Color de pelo según ciudad",ylab="Color de pelo",xlab="Ciudad",cex=0.8)
+```
+<br>
+<h4>Aplicación del test Chi-cuadrado:</h4>
+<br>
+```{r echo=TRUE}
+
+chisq.test(TabPob)
+chisq.test(TabPob)$expected
+chisq.test(TabPob)$residuals
+```
+<br>
+Analizamos las subtablas de contingencia:
+<br>
+```{r echo=TRUE}
+
+TabPob1<-TabPob[-1,]
+chisq.test(TabPob1)
+chisq.test(TabPob1)$expected
+chisq.test(TabPob1)$residuals
+
+TabPob2<-TabPob[-2,]
+chisq.test(TabPob2)
+chisq.test(TabPob2)$expected
+chisq.test(TabPob2)$residuals
+
+TabPob3<-TabPob[-3,]
+chisq.test(TabPob3)
+chisq.test(TabPob3)$expected
+chisq.test(TabPob3)$residuals
+
+```
+<br>
+<br>
+
+## <span style="color:darkred">Test exacto de Fisher</span>
+
+<br>
+Se desea estudiar si la reacción alérgica a un compuesto y una determinada mutación en un gen están asociados. Para ésto se realiza un análisis de sangre sobre un grupo de individuos seleccionados al azar y se anota si es alérgico o no, y si el gen mutó o no. ¿Existe diferencia significativa en la incidencia de la mutación entre los alérgicos y no alérgicos?
+
+H0: la reacción es independiente de la mutación del gen (para todo i y j $P(X=x_i,Y=y_j)=P(X=x_i).P(Y=y_j)$ i= 1, 2; j= 1,2).
+
+H1: la reacción y la mutación no son independientes (exite al menos algún par i y j tal que $P(X=x_i,Y=y_j)\neq P(X=x_i).P(Y=y_j)$ i= 1, 2; j= 1,2).
+
+Contamos con los datos de la siguiente tabla:
+<br>
+```{r echo=TRUE}
+Reaccion<-c( "No alérgico", "No alérgico", "Alérgico", "No alérgico", "No alérgico", "Alérgico", "Alérgico", "Alérgico", "Alérgico", "Alérgico", "Alérgico", "Alérgico", "No alérgico", "No alérgico", "No alérgico", "No alérgico", "Alérgico", "Alérgico", "Alérgico", "Alérgico", "No alérgico", "Alérgico", "No alérgico", "No alérgico", "Alérgico", "Alérgico", "Alérgico")
+Mutacion<-c( FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, TRUE, FALSE, TRUE)
+TabAle<-table(Reaccion, Mutacion)
+TabAle
+```
+
+<br>
+<br>
+
+### <span style="color:darkblue">Gráficos útiles</span>
+<br>
+
+#### Gráfico de barras adyacentes
+
+<br>
+```{r echo=TRUE}
+
+par(bg="white")
+barplot(TabAle,beside=TRUE,col= c("tan1","aquamarine3"),ylim=c(0,11),ylab="Cantidad") 
+#title("Reacción según mutación",cex=0.75)
+mtext("Reacción según mutación",cex=1,line=1)
+legend("topright",cex=0.8,title="Reacción",c("Alérgico","No alérgico"), fill=c("tan1","aquamarine3"),horiz=F, box.lty = 0) 
+``` 
+<br>
+<br>
+
+#### Gráfico de mosaicos
+
+<br>
+```{r echo=TRUE}
+
+mosaicplot(t(TabAle),col=c("tan1","aquamarine3"),main="Reacción según mutación",ylab="Reacción",xlab="Mutación",
+           cex=0.8)
+```
+<br>
+
+#### Aplicación del test exacto de Fisher:
+
+<br>
+```{r echo=TRUE}
+
+fisher.test(TabAle)
+```
+<br>
+
+#### Observar la respuesta que devuelve el test Chi-cuadrado...
+
+<br>
+
+```{r echo=TRUE}
+
+chisq.test(TabAle)
+```
+
+
+# Tests de Normalidad y Homocedasticidad
+
+## <span style="color:darkred">Ejemplo</span>
+
+Se desea analizar los datos de un experimento para estudiar el efecto del porcentaje de algodón sobre la resistencia a la tensión de una fibra sintética.
+
+```{r echo=TRUE}
+porcentaje<-c(rep(15,5),rep(20,5),rep(25,5),rep(30,5),rep(35,5))
+resistencia<-c(7,7,15,11,9,12,17,12,18,18,14,18,18,19,19,19,25,22,19,23,7,10,11,15,11)
+porcAlgodon <-data.frame(porcentaje,resistencia)
+
+porcentaje.f=factor(porcentaje)
+
+plot(resistencia~porcentaje.f)# idem boxplot(resistencia~porcentaje.f)
+
+```
+
+<br>
+
+### Test de homocedasticidad
+
+<br>
+
+#### Analizamos igualdad de varianzas:
+
+```{r echo=TRUE}
+library(car)
+bartlett.test(resistencia,porcentaje.f)
+
+leveneTest(resistencia~porcentaje.f)
+```
+
+<br>
+
+### Test de normalidad
+
+<br>
+
+#### Analizamos normalidad:
+
+```{r echo=TRUE}
+shapiro.test(resistencia)
+
+library(nortest)
+ad.test(resistencia)
+
+library(moments)
+agostino.test(resistencia)
+```
+
+```{r echo=TRUE}
+qqPlot(resistencia,ylab = "resistencia", col = "coral",pch = 19, col.lines = "cadetblue",id=FALSE)
+```
+<br>
+
+
+
+

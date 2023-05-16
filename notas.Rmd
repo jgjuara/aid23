@@ -1,0 +1,371 @@
+---
+title: "Apuntes"
+author:
+date: "`r Sys.Date()`"
+output:
+   html_document:
+     toc: yes
+     code_folding: show
+     toc_float: yes
+     df_print: paged
+     theme: united
+     code_download: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+
+```
+
+## Graficos de exploración
+
+#### Boxplot
+
+$stats (en orden): `Q1 -1.5*IQR; Q1; Mediana; Q2; Q2+ 1.5*IQR`
+$out: outliers (puntos fuera de `Q1 -1.5*IQR;Q2+ 1.5*IQR` )
+
+```{r boxplot.stats}
+boxplot.stats(c(-50,airquality$Ozone))
+```
+
+
+```{r boxplot}
+boxplot(c(-50,airquality$Ozone), horizontal = T)
+
+```
+
+```{r geom_boxplot}
+ggplot() +
+  geom_boxplot(aes(c(-50,airquality$Ozone)))
+```
+
+
+#### Violin
+
+
+
+#### Histograma
+
+```{r hist}
+hist(airquality$Ozone, breaks = 30)
+```
+
+
+#### F de densidad
+
+```{r}
+par(bg="white")
+dens=density(airquality$Ozone, na.rm = T) # Kernel density estimation, es una manera no paramétrica de estimar la función de densidad de una variable aleatoria
+plot(dens,main="Densidad de Ozono",xlab="",ylab="Densidad") # grafica la estimación de la densidad de la variable PESO
+polygon(dens,lwd=2,col="lightblue",border="darkblue",main="Densidad de Peso") # cambia colores de relleno y borde
+```
+
+
+Ver que si la variable tiene un límite (ej: no existen valores de Ozono negativos) el grafico de densidad lo rompe asume una función continua hacia - Inf y +Inf con densidad tendiendo a 0. Esto hace que se deforme un poco la distribución real la variable: por ej., en este caso la variable aparece como si fuera un poco menos asimétrica de lo que se ve en histograma. Se pueden combinar.
+
+
+
+#### F acumulada
+
+```{r plot.ecdf}
+
+plot.ecdf(airquality$Ozone,col="blue",main="Ozono",ylab="F(x)") # dibuja la función de distribución empírica
+
+```
+
+
+
+#### Dispersión
+
+(relacion entre 2 variables)
+
+```{r}
+plot(airquality$Temp, airquality$Ozone) 
+```
+
+## Muestreo
+
+### dplyr::slice_sample
+
+Muestreo con slice_sample
+
+### splitstackshape::stratified
+ 
+```{r}
+# o tmb
+df %>% 
+  group_by(estratos) %>% 
+  slice_sample(n = tamanio_de_estratos)
+
+```
+
+
+### conglomerados
+
+Ejemplo: seleccionamos al azar 2 Grupos de los 10 posibles
+
+Creo el df de ejemplo
+```{r}
+set.seed(1)
+df <- data.frame(
+  Id = 1:100,
+  Grupo = sample(c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J"), 100, replace = TRUE),
+  Var1 = abs(round(rnorm(100), digits=1)),
+  Var2 = sample(1:100, 100, replace = TRUE),
+  Sexo = sample(c("M", "F"), 100, replace = TRUE))
+
+df
+```
+
+Seleccion de grupos
+```{r}
+grupos<-sample(unique(df$Grupo), size = 4, replace = F )
+grupos
+```
+
+Seleccion de las filas de esos grupos
+```{r}
+#muestreo de conglomerados 
+muestra_conglomerados<- df[df$Grupo %in%grupos,]
+
+muestra_conglomerados
+```
+
+### Muestreo sistematico
+
+Seleccion de n elementos de una lista de largo N tal que todos elementos esten a una misma distancia k entre sí
+
+Funcion ej. ad hoc para hacer la seleccion
+
+
+```{r MuestreoSistem}
+MuestreoSistem = function(N, n) {
+  k = ceiling(N/n)
+  r = sample(1:k, 1)
+  muestra = seq(r, r + k * (n - 1), k)
+  muestra
+}
+
+MuestreoSistem(100,5)
+```
+
+## Distribuciones
+
+### Uniforme
+
+#### runif : muestra 
+```{r runif}
+runif(10)
+```
+#### punif: P(X < k) / X unif
+
+Probabilidad de que X sea menor a k siendo X una var aleatoria con distribución uniforme 0 a 1 (valores default se pueden cambiar)
+
+```{r punif}
+print(paste("punif(0.5) =", punif(0.5)))
+print(paste("punif(0.99) = ",punif(0.99)))
+print(paste("punif(0.5, min = 0, max = 2) = ",punif(0.5, min = 0, max = 2)))
+```
+Cambiar direccion de `punif()`
+
+```{r Cambiar direccion de `punif()`}
+punif(0.9)#P(X<0.9)= 0.9
+punif(0.9, lower.tail = F) #P(X>0.9) = 0.1
+
+```
+
+### Normal
+
+#### rnorm
+
+```{r rnorm}
+rnorm(10, 50, sd = 50)
+```
+
+#### pnorm
+
+```{r pnorm}
+print(pnorm(50, 50, sd = 5)) ## P(X<50) tal q la media de X sea 50 y su desvío estadar raiz de 50
+print(pnorm(50, 100, sd = 5)) ## P(X<50) tal q la media de X sea 100 y su desvío estadar sea 5
+
+
+```
+#### Binomial
+
+```{r}
+dbinom(50, size = 100, prob = 0.5) # P(X = 50)
+pbinom(50, 100, prob = 0.5) # P(X <= 50)
+sum(dbinom(0:50, size = 100, prob = 0.5)) # es igual al anterior
+```
+
+```{r}
+n = 100
+p = 0.5
+rango = 0:n
+df = data.frame(x = rango, y = dbinom(rango, size=n, prob=p))
+ggplot(df, aes(x = x, y = y, fill=factor(ifelse(x==p*n,toString(p*n),"Otro")))) +
+  geom_bar(stat = "identity",width = 0.75) + xlab("x") + ylab("Densidad") +
+  ggtitle("Distribución Binomial") +
+  scale_fill_manual(name = "", values=c("red", "grey50")) + theme_bw()
+```
+
+Ejemplo binomial pocas repeticiones sesgada a izq
+
+```{r}
+set.seed(42)
+n = 10
+p = 0.05
+rango = 0:n
+df = data.frame(x = rango, y = dbinom(rango, size=n, prob=p))
+ggplot(df, aes(x = x, y = y, fill=factor(ifelse(x==p*n,toString(p*n),"Otro")))) +
+  geom_bar(stat = "identity") + xlab("x") + ylab("Densidad") +
+  ggtitle("Distribución Binomial") +
+  scale_fill_manual(name = "", values=c("red", "grey50")) + theme_bw()
+```
+
+Ejemplo misma binomial pero muchas reps se parece a la normal
+
+```{r}
+set.seed(42)
+n = 500
+p = 0.05
+rango = 0:n
+df = data.frame(x = rango, y = dbinom(rango, size=n, prob=p))
+ggplot(df, aes(x = x, y = y, fill=factor(ifelse(x==p*n,toString(p*n),"Otro")))) +
+  geom_bar(stat = "identity") + xlab("x") + ylab("Densidad") +
+  ggtitle("Distribución Binomial") +
+  scale_fill_manual(name = "", values=c("red", "grey50")) + theme_bw()
+```
+
+
+#### Otras distribuciones
+
+```{r}
+set.seed(42)
+# gamma
+print("rgamma(n = 10, shape = 3, rate = 2)")
+print(rgamma(n = 10, shape = 3, rate = 2))
+# f de snedekor
+print("rf(10, df1 = 2, df2 = 3)")
+print(rf(10, df1 = 2, df2 = 3))
+# exponencial
+print("rexp(10, 2)")
+print(rexp(10, 2))
+print("rchisq(70,df=4)")
+print(rchisq(10,df=4))
+
+```
+## Test de Independencia
+
+### Chi cuadrado independencia
+
+una sola poblacion
+frecuencias esperadas mayores a 5
+Datos categoricos
+tablas r x c
+r filas (categorias de la variable)
+c columnas (diferentes muestras)
+region de rechazo unilateral a derecha
+rechaza grandes diferencias entre frecuencias esperadas y observadas
+
+H0: las variables son independientes P(X=xi, Y =yj) = P(xi)*P(yj)
+H1: las variables no son independientes
+
+si p-valor < alfa : se rechazo H0, es decir, las variables no son independientes
+
+```{r}
+CantStressBajo<-c(155,204,103)
+CantStressAlto<-c(100,122,183)
+Tab<-as.table(rbind(CantStressBajo,CantStressAlto))
+dimnames(Tab)<-list(Stress=c("Bajo","Alto"),EstadoCivil=c("Soltero","Casado","Divorciado"))
+Tab
+Tab1<-Tab[,-1]
+chisq.test(Tab1)
+```
+
+### chi cuadrado de homogeneidad
+
+2 poblaciones distintas
+La diferencia respecto al anterior formalmente es matemática
+
+H0: P (X = xi | Y = Pobj) = P(X = xi)
+
+pero la aplicacion del test es identica
+
+### test exacto de fisher
+
+Se usa en reemplazo del chi cuadrado si las frecuencias esperadas para alguna celda son menores a 5
+
+```{r}
+fisher.test(Tab1)
+```
+
+
+## Test de homocedasticidad
+
+cuando levene y bartlett den dos resultados diferentes vamos a confiar mas en el de levene porque el de levene es el menos sensible a la falta de la normalidad o valores atipicos
+
+en ambos casos H0 : que ambos grupos tienen varianza similar (hay homocedasticidad)
+H1: al menos uno de los grupos tiene una varianza poblacional diferente
+
+
+
+### test de levene
+
+```{r}
+car::leveneTest(airquality$Ozone, airquality$Month)
+```
+
+
+### test de bartlett
+
+```{r}
+stats::bartlett.test()
+```
+
+## test de normalidad
+
+### test de shapiro
+
+Es el mas usado
+
+```{r}
+stats::shapiro.test()
+```
+
+
+```{r}
+```
+
+
+
+## 22/04/2023
+
+### teorica
+
+_test de fisher de varianzas_:
+- cuando se prueba Sx < Sy se usa Sy/Sx > 1 en vez de Sx/Sy < 1 ya que debido a la asimetria de la distribucion del estadistico de fisher el test no funciona bien para contrastes a la izquierda
+
+_test de mann whitney wilcoxon_:
+- para comparar **2 grupos** cuando no se cumplen criterios de normalidad (x ej. negativa prueba de test de shapiro)
+- ver si son iguales a no los grupos
+
+_test de la mediana_:
+- no requiere probar que las distribuciones son iguales
+- da una idea de la similitud de la  distribucion de los grupos entre su mediana
+
+_anova_:
+- la independencia depende de quien tomo lo muestra (ver qué pruebas de independencia hay)
+- normalidad: x qqplot, x shapiro-wilk (para cada grupo), anderson-darling (idem)
+- homocedasticidad:
+- x levene (todos los grupos)
+(si no se cumple alguno de estos criterios se puede optar por la prueba no parametrica)
+
+_kruskal wallis_
+- no parametrica para muestras independientes
+
+### practica
+
+
+

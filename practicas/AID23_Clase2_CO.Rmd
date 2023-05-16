@@ -1,0 +1,472 @@
+---
+title: "AID Clase 2"
+author: "Cecilia Oliva"
+date: "01/04/2023"
+output:
+   html_document:
+     toc: yes
+     code_folding: show
+     toc_float: yes
+     df_print: paged
+     theme: united
+     code_download: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<br>
+<br>
+
+# Muestreo
+
+<br>
+
+## <span style="color:darkred">Ejemplo: Índice de masa corporal infantil</span>
+
+<br>
+
+Consideramos el siguiente conjunto de datos sobre índice de masa corporal infantil.
+
+<br>
+
+```{r echo=TRUE}
+PACIENTE<-1:30
+EDAD<-c(7, 7, 8, 7, 7, 10,7 ,7, 7 ,9, 9, 11, 7, 9,  9, 11, 12, 7, 11,  6,  8,  8,  7, 10,  7,  8, 10,  7,  9, 10)
+SEXO<-c("M", "M", "M", "F", "M", "M" ,"M", "M", "M", "M", "M", "F", "M" ,"M" ,"F" ,"M", "M" ,"M" ,"M" ,"F" ,"F" ,"F", "F","F", "M" ,"M" ,"F", "F" ,"F" ,"M")  
+PESO<-c(24.4, 23.6, 47.0, 24.0, 23.9, 41.0, 32.9, 22.4, 28.7, 31.4, 28.9, 51.2, 26.2, 58.5, 23.7, 25.5, 49.7, 39.6,42.5, 21.6, 38.0, 26.6, 20.4, 23.7, 21.4, 45.7, 51.3, 28.0, 26.9, 43.9)
+TALLA<-c(1.2, 1.2, 1.4, 1.2, 1.2, 1.4, 1.3, 1.2, 1.3, 1.3, 1.3, 1.6, 1.3, 1.5, 1.3, 1.3, 1.7, 1.3, 1.5, 1.2, 1.3, 1.2, 1.2,1.3, 1.2, 1.4, 1.5, 1.3, 1.3, 1.5)
+IMC<-c(16.94444, 16.38889, 23.97959, 16.66667, 16.59722, 20.91837, 19.46746, 15.55556, 16.98225, 18.57988,17.10059, 20.00000, 15.50296, 26.00000, 14.02367, 15.08876, 17.19723, 23.43195, 18.88889, 15.00000,22.48521, 18.47222, 14.16667, 14.02367, 14.86111, 23.31633, 22.80000, 16.56805, 15.91716, 19.51111)
+PIMC<-c(7.97, 72.72, 97.08, 83.88, 45.85, 87.33, 96.57, 32.88, 80.77, 92.72, 55.54, 77.77, 70.70, 98.69,  3.25,2.07, 38.08, 98.75, 80.60, 39.97, 96.07, 71.06,  3.44,  2.02, 56.86, 98.99, 90.84, 57.50, 44.77, 84.89)
+CC<-c(54, 52, 76, 63, 56, 78, 69, 52, 60, 69, 60, 75, 50, 88, 58, 73, 75, 76, 72, 52, 76, 54, 52, 56, 56, 78, 76, 57, 57, 76)
+CatPeso<-c("N",  "N",  "OB", "N",  "N",  "SO", "OB", "N",  "N",  "SO", "N",  "N",  "N",  "OB", "D",  "D",  "N",  "OB","N" , "N",  "OB", "N",  "D",  "D",  "N",  "OB", "SO", "N",  "N",  "N" )
+IMCin<-data.frame(PACIENTE,EDAD,SEXO,PESO,TALLA,IMC,PIMC,CC,CatPeso)
+
+dim(IMCin)#30  9
+#View(IMCin)
+
+```
+<br>
+
+## <span style="color:darkred">Muestreo simple</span>
+
+<br>
+
+```{r echo=TRUE}
+sample(c(1,2,3), size=2, replace=FALSE)#muestra aleatoria simple a partir de un vector de valores con o sin reemplazo
+sample(1:100, size=50, replace=FALSE)# sin reemplazo # es igual que sample(100,50,FALSE)
+sample(1:100, size=50, replace=TRUE)# con reemplazo
+
+set.seed(111)#fijo la semilla (dura una operación)
+sample(1:100, size=50, replace=TRUE)
+
+sample(c("cara","ceca"), 1, prob=c(0.3,0.7))# Ejemplo de moneda cargada (cuando el tamaño o size es 1 no hace falta el argumento replace)
+```
+
+<br>
+
+Repasamos los ejercicios de la clase pasada:
+
+<br>
+
+
+Ejercicio 5: Simular el lanzamiento de un dado.
+
+Ejercicio 6: Simular el lanzamiento de cuatro dados o de un mismo dado cuatro veces.
+
+Ejercicio 7: Supongamos una urna con 3 bolas blancas y 7 negras, simular la extracción de una
+bola (asignar, por ejemplo, el 1 a bola blanca y 0 a negra).
+
+Ejercicio 8: Simular 8 extracciones con reemplazo de la urna del ejercicio 7.
+
+<br>
+
+## <span style="color:darkred">Usando paquete dplyr</span>
+
+<br>
+
+```{r echo=TRUE}
+library(dplyr)
+
+#Muestra sin reemplazo
+IMCin_muestra<- IMCin %>%
+  sample_n(size=10,replace=FALSE)
+IMCin_muestra
+
+#Muestra con pesos (deben ser positivos y de la misma longitud que la cantidad de filas del dataframe)
+IMCin_muestra2<- IMCin %>%
+  sample_n(size=10,weight=PIMC)
+IMCin_muestra2
+
+#Muestra con una proporción de casos
+IMCin_muestra3<- IMCin %>%
+  sample_frac(0.1)
+IMCin_muestra3
+
+```
+
+
+<br>
+
+## <span style="color:darkred">Muestreo estratificado</span>
+
+<br>
+
+```{r echo=TRUE}
+muestra_estrat_0 <- IMCin%>%
+  group_by(SEXO)%>%
+  sample_n(10)
+
+muestra_estrat_0
+```
+
+<br>
+
+Notamos que, en este caso, no se mantienen las proporciones originales de las categorías de la variable SEXO.
+
+<br>
+
+```{r echo=TRUE}
+
+table(SEXO)
+
+
+muestra_estrat_1 <- IMCin%>%
+  group_by(CatPeso)%>%
+  sample_frac(0.1)
+
+muestra_estrat_1
+
+table(CatPeso)
+
+
+muestra_estrat_2 <- IMCin%>%
+  group_by(CatPeso)%>%
+  sample_frac(0.25)
+
+muestra_estrat_2
+
+```
+
+<br>
+
+Comparando con las proporciones originales, aquí sí se mantienen los porcentajes de cada categoría de la variable CatPeso.
+
+
+<br>
+
+## <span style="color:darkred">Usando paquete splitstackshape</span>
+
+<br>
+
+Recordamos fijar la semilla siempre que se quieran reutilizarse los datos.
+
+<br>
+
+```{r echo=TRUE}
+library(splitstackshape)
+set.seed(2023)
+strat_sexo<-stratified(IMCin, "SEXO", 0.7)
+
+table(strat_sexo$SEXO)
+
+table(strat_sexo$CatPeso)
+
+set.seed(2023)
+strat_sexo_peso<-stratified(IMCin, c("SEXO","CatPeso"), 0.7)
+table(strat_sexo_peso$SEXO)
+                              
+table(strat_sexo_peso$CatPeso)
+```
+
+<br>
+
+Observamos que se mantienen las proporciones originales de las muestras en las variables que son contempladas en el argumento de la función stratified, en principio las otras no tienen necesariamente una distribución similar.
+
+<br>
+
+Comparamos cómo se ven afectadas otras variables como EDAD y PESO.
+
+<br>
+
+```{r echo=TRUE}
+                              
+summary(IMCin$EDAD)
+
+summary(strat_sexo$EDAD)
+
+summary(strat_sexo_peso$EDAD)
+
+summary(stratified(IMCin, c("SEXO","CatPeso","EDAD"), 0.7)$EDAD)
+
+```
+
+```{r echo=TRUE}
+
+summary(IMCin$PESO)
+
+summary(strat_sexo$PESO)
+
+summary(strat_sexo_peso$PESO)
+
+summary(stratified(IMCin, c("SEXO","CatPeso","PESO"), 0.7)$PESO)
+```
+
+
+<br>
+
+## <span style="color:darkred">Muestreo de conglomerados</span>
+
+<br>
+
+```{r echo=TRUE}
+
+set.seed(1)
+df <- data.frame(
+  Id = 1:100,
+  Grupo = sample(c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J"), 100, replace = TRUE),
+  Var1 = abs(round(rnorm(100), digits=1)),
+  Var2 = sample(1:100, 100, replace = TRUE),
+  Sexo = sample(c("M", "F"), 100, replace = TRUE))
+
+df
+
+# Seleccionamos 4 grupos/conglomerados de los 10 totales 
+set.seed(2)
+grupos<-sample(unique(df$Grupo), size = 4, replace = F )
+grupos
+
+#muestreo de conglomerados 
+muestra_conglomerados<- df[df$Grupo %in%grupos,]
+
+muestra_conglomerados
+```
+
+
+<br>
+
+## <span style="color:darkred">Muestreo sistemático</span>
+
+<br>
+
+```{r echo=TRUE}
+
+MuestreoSistem = function(N, n) {
+  k = ceiling(N/n)
+  r = sample(1:k, 1)
+  muestra = seq(r, r + k * (n - 1), k)
+  muestra
+}
+
+MuestreoSistem(100,5)
+
+MuestreoSistem(100,50)
+
+MuestreoSistem(100,75)
+
+ind<-MuestreoSistem(100,75)
+df[ind, ]#contiene NAs por cómo es el algoritmo
+
+indice<-MuestreoSistem(nrow(df), nrow(df) * 0.5)# muestra sistemática del 50%
+indice
+df[indice, ]
+```
+
+
+<br>
+
+## <span style="color:darkred">Generación de muestras aleatorias de distribuciones conocidas y cálculo de probabilidades</span>
+
+<br>
+
+### Ejemplos con distribuciones continuas
+
+<br>
+
+**Distribución uniforme**
+
+<br>
+
+```{r echo=TRUE}
+muestra.unif1=runif(100) # genera una muestra uniforme en [0,1] de 100 datos
+muestra.unif1 # devuelve la muestra generada
+
+punif(0.5)#P(X<0.5)=0.5
+punif(0)#P(X<0)=0
+punif(1)#P(X<1)=1
+
+
+muestra.unif2=runif(200,min=2,max=5) # genera una muestra uniforme en [2,5] de 200 datos
+muestra.unif2 # devuelve la muestra generada
+
+punif(3,min=2,max=5,lower.tail = TRUE)#P(X<3)=0.3333333
+```
+
+<br>
+
+**Distribución normal**
+
+<br>
+
+```{r echo=TRUE}
+muestra.norm.est=rnorm(30) # genera una muestra normal estándar de 30 datos
+muestra.norm.est # devuelve la muestra generada
+
+pnorm(0)#P(X<0)=0.5
+pnorm(-1)#P(X<-1)=0.1586553
+pnorm(1)#P(X<1)=0.8413447
+pnorm(1,lower.tail = FALSE)#P(X>=1)=0.1586553
+1-(pnorm(1))#0.1586553
+
+muestra.norm=rnorm(50,mean=10,sd=3) # genera una muestra normal(10,3) de 50 datos
+muestra.norm # devuelve la muestra generada
+
+pnorm(2,mean=2,sd=1)#0.5
+pnorm(3,mean=2,sd=1)#0.8413447
+pnorm(-1,mean=2,sd=1)#0.001349898
+pnorm(1,mean=2,sd=1)#0.1586553
+pnorm(1,mean=2,sd=1,lower.tail = FALSE)#0.8413447
+1-(pnorm(1,mean=2,sd=1))#0.8413447
+
+```
+
+<br>
+
+## <span style="color:darkred">Algunos gráficos</span>
+
+<br>
+
+```{r echo=TRUE}
+library(ggplot2)
+
+media=2
+desv=0.3
+x1=2
+x2=1.5
+pnorm(x1,mean=media,sd=desv)-pnorm(x2,mean=media,sd=desv)#P(x1<X<x2)
+
+rango=c(media-3*desv, media+3*desv)
+ggplot(data.frame(x = rango), aes(x=rango)) +
+  stat_function(fun = dnorm, n = 101, args = list(mean = media, sd = desv))+
+  geom_area(stat = 'function',fun = dnorm,args = list(mean = media, sd =desv),
+            fill = 'red',xlim = c(x2, x1),alpha = 0.3)+
+  ylab("Densidad") + ggtitle("Distribución Normal") + xlab("x") + theme_bw()
+
+
+x0=2.3
+pnorm(x0,mean=media,sd=desv,lower.tail = FALSE)#P(X>=2.3)
+rango=c(media-3*desv, media+3*desv)
+ggplot(data.frame(x = rango), aes(x=rango)) +
+  stat_function(fun = dnorm, n = 101, args = list(mean = media, sd = desv))+
+  geom_area(stat = 'function',fun = dnorm,args = list(mean = media, sd =desv),
+            fill = 'red',xlim = c(x0, max(rango)),alpha = 0.3)+
+  ylab("Densidad") + ggtitle("Distribución Normal") + xlab("x") + theme_bw()
+
+
+
+p=0.75
+qnorm(p,mean=media,sd=desv)
+
+rango=c(media-3*desv, media+3*desv)
+ggplot(data.frame(x = rango), aes(x=rango)) +
+  stat_function(fun = dnorm, n = 101, args = list(mean = media, sd = desv))+
+  geom_area(stat = 'function',fun = dnorm,args = list(mean = media, sd =desv),
+            fill = 'red',xlim = c(min(rango), qnorm(p,mean=media,sd=desv)),alpha = 0.3)+
+  geom_vline(xintercept=qnorm(p,mean=media,sd=desv))+
+  ylab("Densidad") + ggtitle("Distribución Normal") + xlab("x") + theme_bw()
+```
+
+<br>
+
+## <span style="color:darkred">Otras distribuciones</span>
+
+<br>
+
+```{r echo=TRUE}
+library(ggplot2)
+muestra.gamma=rgamma(40,rate=2, shape=3) # genera una muestra gamma(2,3) de 40 datos
+muestra.gamma # devuelve la muestra generada
+muestra.f=rf(80,df1=5,df2=6) # genera una muestra F de Snedekor(5,6) de 80 datos
+muestra.f # devuelve la muestra generada
+muestra.exp=rexp(90,2) # genera una muestra exponencial(2) de 90 datos
+muestra.exp # devuelve la muestra generada
+muestra.chi=rchisq(70,df=4) # genera una muestra chi cuadrado con 4 grados de libertad de 70 datos
+muestra.chi # devuelve la muestra generada
+
+pchisq(1,df=4)#0.09020401
+pchisq(10,df=4)#0.9595723
+pchisq(5,df=4)#0.9595723
+1-pchisq(5,df=4)#1-0.7127025=0.2872975
+
+x0=5
+rango = sort(muestra.chi)
+rango=c(0,rango)
+ggplot(data.frame(x = rango), aes(x=rango)) +
+  stat_function(fun = dchisq, n = 101, args = list(df = 4))+
+  geom_area(stat = 'function',fun = dchisq,args = list(df = 4),
+            fill = 'red',xlim = c(x0, max(rango)),alpha = 0.3)+
+  ylab("Densidad") + ggtitle("Distribución Chi-cuadrado") + xlab("x") + theme_bw()
+
+```
+
+<br>
+
+## <span style="color:darkred">Ejemplo con distribución discreta binomial</span>
+
+<br>
+
+```{r echo=TRUE}
+library(ggplot2)
+n=100
+p=0.25
+x0=35
+dbinom(x0,size=n,prob=p)#P(X=x0)=0.007019775
+
+
+rango = 0:n
+df = data.frame(x = rango, y = dbinom(rango, size=n, prob=p))
+ggplot(df, aes(x = x, y = y, fill=factor(ifelse(x==x0,toString(x0),"Otro")))) +
+  geom_bar(stat = "identity",width = 0.75) + xlab("x") + ylab("Densidad") +
+  ggtitle("Distribución Binomial") +
+  scale_fill_manual(name = "", values=c("red", "grey50")) + theme_bw()
+```
+
+<br>
+
+## <span style="color:darkred">Ejemplo cuando no se conoce la distribución de los datos</span>
+
+<br>
+
+Retomando el ejemplo de datos de índice de masa corporal infantil, podemos calcular la probabilidad de que la edad sea menor o igual a 7.
+
+<br>
+
+```{r echo=TRUE}
+sum(EDAD<=7)/length(EDAD)
+```
+
+<br>
+
+# Teorema de Bayes
+
+<br>
+
+![](C:/Users/cecim/Documents/Ce/2023/AID2023/AIDproject2023/TeoBayes.jpg)
+
+<br>
+
+Supongamos que tenemos tres urnas: la urna roja (R) que contiene 15 bolas blancas y 10 negras; la urna verde (V) que contiene 10 bolas blancas y 17 negras; y la urna azul (A) que contiene 5 bolas blancas y 15 negras. Se solicita extraer de las urnas 1 bola. 
+
+<br>
+
+#### </span>**<font color="darkred">Ejercicio 1: </font>** *Calcular la probabilidad de que la bola provenga de la urna R.*</span>
+
+#### </span>**<font color="darkred">Ejercicio 2: </font>** *Calcular la probabilidad de que la bola sea blanca y provenga de la urna R.*</span>
+
+#### </span>**<font color="darkred">Ejercicio 3: </font>** *Calcular la probabilidad de que, sabiendo que la bola extraída es de la urna A, sea negra.*</span>
+
+#### </span>**<font color="darkred">Ejercicio 4: </font>** *Calcular la probabilidad de que, sabiendo que la bola extraída es negra, provenga de la urna A.*</span>
+
+#### </span>**<font color="darkred">Ejercicio 5: </font>** *Suponiendo ahora que se extrajeron dos bolas, calcular la probabilidad de que, sabiendo que se extrajeron una bola blanca y luego una negra, la bola blanca provenga de la urna R y la negra provenga de la urna V.*</span>
+

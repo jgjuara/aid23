@@ -1,0 +1,1073 @@
+---
+title: "Clase 1: Introducción a R - Análisis exploratorio de datos (EDA)"
+author: "Práctico AID 2023"
+date: "25/03/2023"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+    df_print: paged
+---
+
+**Temario:**
+
+* Breve introducción a R y Rstudio
+* Clasificación y exploración de datos.
+* Técnicas de análisis univariado. 
+* Análisis descriptivo de datos estructurados. 
+* Visualización de la información.
+
+<br>
+
+--- 
+
+# Introducción 
+
+## Configuración general
+```{r configuracion_gral}
+# indica desde dónde instalar paquetes
+options(repos = c(CRAN = "http://cran.rstudio.com")) 
+# para fijar el directorio
+setwd('/Users/FR/Documents/Burocrático/DOCENCIA/MATERIAS/8_AID/2023') #mac
+# setwd("C:/workspace2") #o bien setwd("C:\\workspace2") en windows
+# para saber en qué directorio estamos
+getwd() 
+
+# todo esto mismo se puede hacer desde Rstudio>Tools>Global options>General o Packages
+```
+
+<br>
+
+## Tipos de datos
+
+<br>
+
+![Tipos de datos](/Users/FR/Documents/tipos_datos.png)
+
+<br>
+
+## Operaciones
+
+* **Operaciones matemáticas básicas**
+
+<br>
+
+![Operaciones matemáticas básicas](/Users/FR/Documents/op_matematicas_basicas.png){height=340px width=270px}
+<br>
+
+* **Operaciones lógicas**
+
+<br>
+
+![Operaciones lógicas](/Users/FR/Documents/op_logicas.png){height=400px width=300px}
+<br>
+
+```{r operaciones 1}
+#Operaciones básicas
+
+2+6 
+3*4
+-4/5 
+4^0.2 
+sqrt(9) # raíz cuadrada
+cos(pi) # funciones trigonométricas
+exp(-2) # función exponencial
+factorial(5) #factorial de un número
+log(8)
+pi
+round(pi,3) # redondea el valor de pi a 3 decimales
+signif(pi,2) # devuelve el valor con dos cifras significativas
+abs(-8) # devuelve el valor absoluto
+```
+
+## Asignación a variables, vectores y matrices, operaciones
+
+<br>
+
+### **Variables**
+
+```{r asignación_variables}
+
+n = 3 # <- puede no ser global (dentro de una fc, por ejemplo)
+n <- 3 # <- asignación global
+
+vec<-c(1,2,3)
+c(1,2,3)->vec
+vec
+
+1:5 # números del 1 al 5 orden creciente
+15:10 # números del 15 al 10 orden decreciente
+
+x <- seq(1,8) # secuencia de enteros
+x
+y<-seq(1,4,0.2) # devuelve los números de 1 a 4 espaciados en 0.2
+y
+z<-rep(1,5) # repite el 1 cinco veces
+z
+w<-rep(1:3,4) # repite del 1 al 3 cuatro veces
+w
+q<-rep(c(1,3,7),2) # repite la concatenación dos veces
+q
+
+m <- c(T,F,F,T) # concatena valores lógicos
+m
+
+l<-w>2 # asigna una proposición a la variable l
+w
+l # asigna valor de verdad de la proposición 
+p<-c(T,F,T,F)
+p
+m&p # devuelve la conjunción entre componentes de vectores lógicos de igual longitud
+m|p # devuelve la disyunción entre componentes de vectores lógicos de igual longitud
+!m # devuelve la negación de cada componente
+
+w
+w[1] # LA PRIMERA POSICIÓN ES EL 1!! (python es 0)
+w[5] # devuelve la quinta componente almacenada en el vector w
+w[2:4] # davuelve las componentes de 2 a 4 del vector w
+w[c(1,4,6)] # devuelve las componentes 1, 4 y 6 del vector w
+w[-c(1,4,6)] # devuelve el vector w sin las componentes 1, 4 y 6
+
+sort(w)# ordena las componentes numéricas en orden creciente
+sort(w,decreasing=TRUE)# ordena las componentes numéricas en orden decreciente
+w2<-unique(w)
+w2
+w3<-duplicated(w)
+w3
+```
+
+
+<br>
+
+### **Vectores**
+
+```{r vectores}
+u=c(3,8,2,7,3,2,1)
+order(u)
+u==3  # operación lógica que busca las posiciones de u que guardan el 3
+u[u==3]<-4 # en esas posiciones asigna un 4   
+u
+which(u>=4) # devuelve las posiciones de u que tienen números mayores o iguales a 4
+u[which(u>=4)]<-0 # asigna 0 a esas posiciones
+u
+rev(u) # invierte el orden de las componentes del vector
+
+veccha<-c("Alicia","Pedro","casa")
+names(vec)<-veccha
+vec["casa"]
+order(veccha)
+sort(veccha)# ordena alfabéticamente las componentes del vector de caracteres
+
+h <- paste(c("a","b","c","d"), 2:5, sep="") # genera pares ordenados 
+h
+t=paste(c("a","b"), 2:6, sep=",") # genera pares ordenados separados por comas
+t
+
+```
+
+```{r operaciones_basicas}
+length(w) # devuelve la longitud del vector w
+length(c(w,h)) # devuelve la longitud del vector w concatenado con h
+mode(w) # devuelve el tipo de datos del vector w, en este caso numérico
+mode(h) # devuelve el tipo de datos del vector h, en este caso de caracteres
+mode(m) # devuelve el tipo de datos del vector m, en este caso lógico
+storage.mode(y) # equivalente a mode, en este caso el tipo es "double" que significa de doble precisión
+storage.mode(w) # en este caso el tipo es entero
+storage.mode(h)
+storage.mode(m)
+
+v1<-rep(2,4)
+v2<-2:5
+-2*v2 # producto de un vector por un escalar
+v2+3  # suma 3 a cada componente
+v1+3*v2 # combinación lineal de vectores
+v1/v2 # división componente a componente
+v1*v2 # producto componente a componente
+v1**v2 # potenciación componente a componente
+
+v3=2*v1-3*v2
+v3
+min(v3) # devuelve el valor mínimo del vector
+max(v3) # devuelve el valor máximo del vector
+sum(v3) # suma las componentes del vector
+cumsum(v3) # devuelve un vector que guarda en cada componente la suma de las anteriores más esa
+prod(v3) # multiplica las componentes de un vector
+cumprod(v3)# devuelve un vector que guarda el producto acumulado
+mean(v3) #calcula el promedio o media de los valores del vector
+median(v3)#calcula la mediana de los valores del vector
+sum(v1*v2) # producto escalar de dos vectores
+v1%*%v2    # producto escalar de dos vectores
+
+```
+
+
+```{r funciones 1}
+
+#Uso de for:
+MiVectorInicial<-rep(0,10)
+
+for (i in 1:10){
+  MiVectorInicial[i]<-2*(i+1)
+}
+
+MiVectorInicial
+
+#Uso de if:
+if(length(MiVectorInicial)>1){
+  print("Es un vector")
+}else{
+    print("Es un escalar")}
+
+#Ejemplo de función:
+Promedio<-function(vectorNumerico){
+  prom<-sum(vectorNumerico)/length(vectorNumerico)
+  return(prom)
+}
+
+Promedio(c(1,-4,5,0,10))
+
+```
+
+
+<br>
+
+### **Matrices**
+
+```{r matrices}
+ls() # lista todas las variables que se han creado en el espacio de trabajo
+
+data=1:10
+matrix(data,nrow=2,ncol=5) # acomoda los datos por columna en una matriz de nrow filas y ncol columnas
+matrix(data,nrow=2,ncol=5,byrow=T)  # # acomoda los datos por fila en una matriz de nrow filas y ncol columnas
+matrix(c(2,4,5,6,-8,11),nrow=2)  # acomoda la concatenación por columnas de acuerdo a la cantidad de filas indicada
+
+vec1=seq(2,5)   
+vec2=seq(-5,-2)
+cbind(vec1,vec2)  # devuelve la matriz que tiene a estos vectores como columnas
+rbind(vec1,vec2)  # devuelve laa matriz que tiene a estos vectores como filas
+
+mat1=matrix(data,nrow=2,ncol=5) # asigna valores a una matriz
+mat1 # devuelve la matriz
+colnames(mat1)<-c("A","B","C","D","E") # asigna nombres a las columnas de la matriz
+mat1 # devuelve la matriz, ahora con nombres en sus columnas
+rownames(mat1)<-c("2015","2016") # asigna nombres a las filas de la matriz
+mat1 # devuelve la matriz, ahora con nombres en sus filas
+
+dim(mat1) # devuelve la cantidad de filas y de columnas de la matriz
+storage.mode(mat1) # devuelve el tipo de valores guardados en la matriz
+
+mat1[1,2] # devuelve el elemento de la fila 1 y la columna 2 de la matriz
+mat1[1,3:5] # devuelve los elementos de la fila 1 y correspondientes a las columnas de 3 a 5
+mat1[1,] # devuelve la fila 1 de la matriz
+mat1[,2] # devuelve la columna 2 de la matriz
+mat1[1,2]<--3.1 # asigna un valor dado en la fila 1 y la columna 2 de la matriz
+mat1
+storage.mode(mat1) # observar que cambió el modo de almacenamiento de la matriz
+
+mat2<-matrix(seq(10,1),nrow=2,byrow=T) # asigna valores a una nueva matriz
+mat2 # devuelve la matriz
+t(mat2) # devuelve la matriz transpuesta de la matriz
+mat1+mat2 # suma de matrices
+mat1-mat2 # resta de matrices
+mat2+3 # suma 3 a cada elemento de la matriz
+3*mat2 # producto de matriz por escalar
+mat1*mat2 # producto elemento a elemento
+sqrt(mat2) # raíz cuadrada de cada elemento de la matriz
+sqrt(mat1) # observar que cuando la operación no está definida devuelve NaN
+sqrt(-9) # no está definido
+
+mat3=mat1%*%t(mat2) # asigna a una matriz el producto de dos matrices
+mat3 # devuelve el resultado del producto matricial
+det(mat3) # devuelve el determinante de la matriz
+solve(mat3) # devuelve la matriz inversa de la matriz
+mat3%*%solve(mat3) # devuelve el producto de una matriz por su inversa; es decir, la matriz identidad
+crossprod(mat3,solve(mat3)) # devuelve el producto entre la traspuesta de la primera matriz y la segunda matriz
+diag(mat3) # devuelve la diagonal principal de la matriz
+sum(diag(mat3)) # devuelve la traza de la matriz
+
+mat1
+apply(mat1,1,sum) # devuelve la suma de cada fila de la matriz
+apply(mat1,2,sum) # devuelve la suma de cada columna de la matriz
+apply(mat1,2,min) # devuelve el mínimo de cada columna de la matriz
+apply(mat1,1,mean) # devuelve la media de cada fila de la matriz
+apply(mat1,1,median) # devuelve la mediana de cada fila de la matriz
+apply(mat1,1,var) # devuelve la varianza de cada fila de la matriz
+apply(mat1,1,sd) # devuelve el desvío estándar de cada fila de la matriz
+apply(mat1,1,summary) # devuelve un resumen de cada fila de la matriz, incluyendo valor mínimo, primer cuartil, mediana, media, tercer cuartil y valor máximo y cantidad de valores NA (Not available) si hay
+
+sample(c(1,2,3), size=2, replace=FALSE)#muestra aleatoria simple a partir de un 
+#vector de valores con o sin reemplazamiento
+sample(1:100, size=50, replace=FALSE)# sin reemplazo
+# es igual que sample(100,50,FALSE)
+sample(1:100, size=50, replace=TRUE)# con reemplazo
+
+set.seed(111)#fijo la semilla (dura una operación)
+sample(1:100, size=50, replace=TRUE)
+
+sample(c("cara","ceca"), 1, prob=c(0.3,0.7))# Ejemplo de moneda cargada
+#(cuando el tamaño o size es 1 no hace falta el argumento replace)
+
+```
+
+
+<br>
+
+### **Dataframes**
+
+```{r DF}
+# Ejemplo 1
+Nombre = c("Ana","Luis","Pedro","Juan","Eva","Jorge") # crea un vector con los nombres
+Edad = c(23,24,22,24,25,27) # crea un vector con las edades correspondientes 
+Sexo = as.factor(c("F",rep("M",3),"F","M")) # crea un vector como factor con el sexo correspondiente 
+levels(Sexo) # devuelve los grupos del vector dado como factor
+datos=data.frame(Nombre,Edad,Sexo) # arma un entorno de datos
+datos 
+mean(datos$Edad[datos$Sexo=="F"]) # devuelve el promedio de la edad de las mujeres
+
+table(datos[[3]]) # devuelve una tabla de frecuencias del factor Sexo
+table(datos$Sexo)
+
+# Ejemplo 2
+dfr<-data.frame("Dia"=c(1:5),"Mes"=rep("Abril",5))
+dfr[,1]
+dfr$Mes
+class(dfr)#devuelve la clase, es decir el tipo de objeto
+```
+
+
+<br>
+
+
+<br>
+
+### **Listas**
+```{r LISTAS}
+u=c(3,8,2,7,3,2,1)
+u[u==3]<-4 # en esas posiciones asigna un 4   
+u[which(u>=4)]<-0 # asigna 0 a esas posiciones
+u
+class(u) # para saber qué tipo de datos es
+
+data=1:10
+mat1=matrix(data,nrow=2,ncol=5) # asigna valores a una matriz
+colnames(mat1)<-c("A","B","C","D","E") # asigna nombres a las columnas de la matriz
+rownames(mat1)<-c("2015","2016") # asigna nombres a las filas de la matriz
+mat2<-matrix(seq(10,1),nrow=2,byrow=T)
+mat3=mat1%*%t(mat2)
+mat3
+
+vec1=seq(2,5)
+
+milista<-list(c(T,F),dfr,u,"curso R",mat3) # genera una lista de objetos
+milista # devuelve la lista creada
+names(milista)<-c("valores de verdad","df","vector u","título","matriz 3") # asigna nombres a los elementos de la lista
+milista # devuelve la lista con nombres 
+milista2=list("a"=3,"b"=mat3,"c"=vec1) # genera otra lista
+milista2 # devuelve la otra lista
+class(milista2)#devuelve la clase, es decir el tipo de objeto
+
+names(milista)
+milista$título # devuelve el elemento guardado según el nombre
+milista[[2]] # devuelve el elemento guardado según la posición
+length(milista) # devuelve la cantidad de elementos de la lista
+milista$a<-7 # agrega una componente al final de la lista
+milista # devuelve la lista modificada
+milista[[2]]<-mat1 # reasigna un valor de una componente según la posición
+milista # devuelve la lista modificada
+
+split(datos,Sexo) # particiona un entorno de datos a partir del factor Sexo
+datos2=data.frame(datos,"Nación"=as.factor(c(rep("arg",3),rep("per",3)))) # agrega información al entorno de datos
+datosmujeres=split(datos2,datos2$Sexo)[[1]] # almacena los datos correspondientes a la partición por mujeres
+split(datosmujeres,datosmujeres$Nación) # particiona los nuevos datos por el factor Nación; es decir, se ha particionado un dataframe por dos factores
+
+
+```
+
+
+<br>
+
+
+<br>
+
+### **Distribuciones**
+```{r distribuciones}
+# Generación de muestras de distribuciones conocidas
+
+muestra.unif1=runif(100) # genera una muestra uniforme en [0,1] de 100 datos
+muestra.unif1 # devuelve la muestra generada
+muestra.unif2=runif(200,min=2,max=5) # genera una muestra uniforme en [2,5] de 200 datos
+muestra.unif2 # devuelve la muestra generada
+muestra.norm.est=rnorm(30) # genera una muestra normal estándar de 30 datos
+muestra.norm.est # devuelve la muestra generada
+muestra.norm=rnorm(50,mean=10,sd=3) # genera una muestra normal(10,3) de 50 datos
+muestra.norm # devuelve la muestra generada
+muestra.gamma=rgamma(40,rate=2, shape=3) # genera una muestra gamma(2,3) de 40 datos
+muestra.gamma # devuelve la muestra generada
+muestra.f=rf(80,df1=5,df2=6) # genera una muestra F de Snedekor(5,6) de 80 datos
+muestra.f # devuelve la muestra generada
+muestra.exp=rexp(90,2) # genera una muestra exponencial(2) de 90 datos
+muestra.exp # devuelve la muestra generada
+muestra.chi=rchisq(70,df=4) # genera una muestra chi cuadrado con 4 grados de libertad de 70 datos
+muestra.chi # devuelve la muestra generada
+
+```
+
+* *EJEMPLO DE OPERACIONES SOBRE DF*
+```{r operaciones_sobre_df}
+
+# Cargo la base:
+PACIENTE<-1:30
+EDAD<-c(7, 7, 8, 7, 7, 10,7 ,7, 7 ,9, 9, 11, 7, 9,  9, 11, 12, 7, 11,  6,  8,  8,  7, 10,  7,  8, 10,  7,  9, 10)
+SEXO<-c("M", "M", "M", "F", "M", "M" ,"M", "M", "M", "M", "M", "F", "M" ,"M" ,"F" ,"M", "M" ,"M" ,"M" ,"F" ,"F" ,"F", "F","F", "M" ,"M" ,"F", "F" ,"F" ,"M")  
+PESO<-c(24.4, 23.6, 47.0, 24.0, 23.9, 41.0, 32.9, 22.4, 28.7, 31.4, 28.9, 51.2, 26.2, 58.5, 23.7, 25.5, 49.7, 39.6,42.5, 21.6, 38.0, 26.6, 20.4, 23.7, 21.4, 45.7, 51.3, 28.0, 26.9, 43.9)
+TALLA<-c(1.2, 1.2, 1.4, 1.2, 1.2, 1.4, 1.3, 1.2, 1.3, 1.3, 1.3, 1.6, 1.3, 1.5, 1.3, 1.3, 1.7, 1.3, 1.5, 1.2, 1.3, 1.2, 1.2,1.3, 1.2, 1.4, 1.5, 1.3, 1.3, 1.5)
+IMC<-c(16.94444, 16.38889, 23.97959, 16.66667, 16.59722, 20.91837, 19.46746, 15.55556, 16.98225, 18.57988,17.10059, 20.00000, 15.50296, 26.00000, 14.02367, 15.08876, 17.19723, 23.43195, 18.88889, 15.00000,22.48521, 18.47222, 14.16667, 14.02367, 14.86111, 23.31633, 22.80000, 16.56805, 15.91716, 19.51111)
+PIMC<-c(7.97, 72.72, 97.08, 83.88, 45.85, 87.33, 96.57, 32.88, 80.77, 92.72, 55.54, 77.77, 70.70, 98.69,  3.25,2.07, 38.08, 98.75, 80.60, 39.97, 96.07, 71.06,  3.44,  2.02, 56.86, 98.99, 90.84, 57.50, 44.77, 84.89)
+CC<-c(54, 52, 76, 63, 56, 78, 69, 52, 60, 69, 60, 75, 50, 88, 58, 73, 75, 76, 72, 52, 76, 54, 52, 56, 56, 78, 76, 57, 57, 76)
+CatPeso<-c("N",  "N",  "OB", "N",  "N",  "SO", "OB", "N",  "N",  "SO", "N",  "N",  "N",  "OB", "D",  "D",  "N",  "OB","N" , "N",  "OB", "N",  "D",  "D",  "N",  "OB", "SO", "N",  "N",  "N" )
+IMCin<-data.frame(PACIENTE,EDAD,SEXO,PESO,TALLA,IMC,PIMC,CC,CatPeso)
+#View(IMCin)
+
+head(IMCin) # muestra las seis primeras filas de datos y los nombres de las columnas
+tail(IMCin)# muestra las seis últimas filas de datos y los nombres de las columnas
+
+dim(IMCin)#30 9
+
+rbind(head(IMCin),tail(IMCin))#une filas: las seis primeras filas con las seis últimas
+cbind(IMCin$SEXO[1:5],IMCin$PESO[1:5]) #cuidado!
+data.frame(IMCin$SEXO[1:5],IMCin$PESO[1:5]) #une columnas con sus 5 primeros elementos
+
+table(IMCin$SEXO) # devuelve las frecuencias absolutas de las categorías de la variable
+
+dist.conj=table(IMCin$CatPeso, IMCin$SEXO) # devuelve la distribución conjunta de las variables categoría de peso y sexo
+
+Z= IMCin$TALLA*100 # guarda los datos de la talla en centímetros
+mean(Z) # calcula la media
+median(Z) # calcula la mediana 
+quantile(Z, 0.75) # calcula el cualtil 75
+quantile(Z, probs = seq(0, 1, 0.25)) # calcula los cuantiles 0, 25, 50, 75 y 100
+
+is.na(Z) # indica los valores que faltan
+W<-Z 
+W[1]<-NA # asigna un valor perdido en la primera componente del vector W
+is.na(W)
+mean(W) # devuelve NA
+mean(W,na.rm=T) # no considera los valores no disponibles
+mean(na.omit(W)) # equivalente al anterior
+median(W,na.rm=T) # otra funcion que requiere excluir los valores no disponibles
+sd(W,na.rm=T) # otra funcion que requiere excluir los valores no disponibles
+
+
+```
+
+
+
+
+<br>
+
+## Ejercicios
+
+* **Ejercicio 1**
+Calcular la media y mediana del vector x y el número de valores que están por debajo de la media y de la mediana, siendo x: x<-c(1,5,7,9,3,5,6,2,4,7,5,6,9,8,6,2,6,1,4).
+
+* **Ejercicio 2**
+Escribir la función que calcula el módulo de un número real.
+
+* **Ejercicio 3**
+Usar for para hallar el resultado de dividir de manera consecutiva el número 1111 por los siguientes divisores (en este orden): 2, 3, 4, 5, 6.
+
+* **Ejercicio 4**
+Escribir una función que responda el signo del producto de dos factores dado, es decir "Positivo", o "Negativo", y en el caso que el producto sea 0 devuelva "Nulo".
+
+* **Ejercicio 5**
+Simular el lanzamiento de un dado.
+
+* **Ejercicio 6**
+Simular el lanzamiento de cuatro dados o de un mismo dado cuatro veces.
+
+* **Ejercicio 7**
+Supongamos una urna con 3 bolas blancas y 7 negras, simular la extracción de una bola (asignar, por ejemplo, el 1 a bola blanca y 0 a negra).
+
+* **Ejercicio 8**
+Simular 8 extracciones con reemplazamiento de la urna del ejercicio 7.
+
+* **Ejercicio 9**
+Calcular las frecuencias porcentuales de la variable sexo.
+
+* **Ejercicio 10**
+Calcular la distribución porcentual de la variable categoría peso por sexo.
+
+
+<br>
+
+---
+
+
+<br>
+
+
+## Resueltos
+
+
+<br>
+
+
+* **Ejercicio 1**
+
+x=c(1,5,7,9,3,5,6,2,4,7,5,6,9,8,6,2,6,1,4)
+
+m=mean(x) #calcula la media de los valores del vector
+
+M=median(x) #calcula la mediana de los valores del vector
+
+sum(x<m) #calcula cuántos valores quedan por debajo de la media m 
+
+sum(x<M) #calcula cuántos valores quedan por debajo de la mediana M
+
+* **Ejercicio 2**
+
+OPCION 1
+
+modulo<-function(x){
+
+  if(x>=0){
+  
+    return(x)
+    
+  }
+  
+  else{
+  
+    return(-x)
+    
+  }
+  
+}
+
+OPCION 2
+
+modu = function(x) {
+
+  y = abs(x)
+  
+  return(y)
+}
+
+* **Ejercicio 3**
+
+cocientes=rep(0,5) # inicializo el vector de cocientes en cero
+
+y = 1111
+
+for (i in 2:6){
+
+  y = y/i
+  
+  cocientes[i-1]=y
+  
+}
+
+print(cocientes)
+
+* **Ejercicio 4**
+
+Definimos la función signo
+
+signo = function(x,y) {
+
+  z = x*y
+  
+  res = ifelse(z==0,"Nulo",ifelse(z>0,"positivo","negativo"))
+  
+  return(res)
+}
+
+signo(0,-2)
+
+* **Ejercicio 5**
+
+sample(c(1,2,3,4,5,6), size=1)
+
+* **Ejercicio 6**
+
+sample(c(1,2,3,4,5,6), size=4, replace=TRUE)
+
+* **Ejercicio 7**
+
+sample(c(0,1), size=1,  prob=c(0.3,0.7))
+
+* **Ejercicio 8** 
+
+sample(c(0,1), size=8, replace=TRUE, prob=c(0.3,0.7))
+
+* **Ejercicio 9**
+
+*Cargo la base:*
+
+PACIENTE<-1:30
+
+<br>
+
+EDAD <- c(7, 7, 8, 7, 7, 10,7 ,7, 7 ,9, 9, 11, 7, 9,  9, 11, 12, 7, 11,  6,  8,  8,  7, 10,  7,  8, 10,  7,  9, 10)
+
+<br>
+
+SEXO <- c("M", "M", "M", "F", "M", "M" ,"M", "M", "M", "M", "M", "F", "M" ,"M" ,"F" ,"M", "M" ,"M" ,"M" ,"F" ,"F" ,"F", "F","F", "M" ,"M" ,"F", "F" ,"F" ,"M")  
+
+<br>
+
+PESO <- c(24.4, 23.6, 47.0, 24.0, 23.9, 41.0, 32.9, 22.4, 28.7, 31.4, 28.9, 51.2, 26.2, 58.5, 23.7, 25.5, 49.7, 39.6,42.5, 21.6, 38.0, 26.6, 20.4, 23.7, 21.4, 45.7, 51.3, 28.0, 26.9, 43.9)
+
+<br>
+
+TALLA <- c(1.2, 1.2, 1.4, 1.2, 1.2, 1.4, 1.3, 1.2, 1.3, 1.3, 1.3, 1.6, 1.3, 1.5, 1.3, 1.3, 1.7, 1.3, 1.5, 1.2, 1.3, 1.2, 1.2,1.3, 1.2, 1.4, 1.5, 1.3, 1.3, 1.5)
+
+<br>
+
+IMC <- c(16.94444, 16.38889, 23.97959, 16.66667, 16.59722, 20.91837, 19.46746, 15.55556, 16.98225, 18.57988,17.10059, 20.00000, 15.50296, 26.00000, 14.02367, 15.08876, 17.19723, 23.43195, 18.88889, 15.00000,22.48521, 18.47222, 14.16667, 14.02367, 14.86111, 23.31633, 22.80000, 16.56805, 15.91716, 19.51111)
+
+<br>
+
+PIMC <- c(7.97, 72.72, 97.08, 83.88, 45.85, 87.33, 96.57, 32.88, 80.77, 92.72, 55.54, 77.77, 70.70, 98.69,  3.25,2.07, 38.08, 98.75, 80.60, 39.97, 96.07, 71.06,  3.44,  2.02, 56.86, 98.99, 90.84, 57.50, 44.77, 84.89)
+
+<br>
+
+CC <- c(54, 52, 76, 63, 56, 78, 69, 52, 60, 69, 60, 75, 50, 88, 58, 73, 75, 76, 72, 52, 76, 54, 52, 56, 56, 78, 76, 57, 57, 76)
+
+<br>
+
+CatPeso <- c("N",  "N",  "OB", "N",  "N",  "SO", "OB", "N",  "N",  "SO", "N",  "N",  "N",  "OB", "D",  "D",  "N",  "OB","N" , "N",  "OB", "N",  "D",  "D",  "N",  "OB", "SO", "N",  "N",  "N" )
+
+<br>
+
+IMCin <- data.frame(PACIENTE,EDAD,SEXO,PESO,TALLA,IMC,PIMC,CC,CatPeso)
+
+<br>
+
+_combina las dos frecuencias en una salida_
+
+sal.sexo=rbind(table(IMCin$SEXO),100*table(IMCin$SEXO)/length(IMCin$SEXO)) 
+
+<br>
+
+_asigna nombre a las filas de la salida_
+
+rownames(sal.sexo)=c("frec.abs","frec.porc") 
+
+<br>
+
+_asigna nombre a las columnas de la salida_
+
+colnames(sal.sexo)=c("Femenino", "Masculino") 
+
+<br>
+
+_muestra la salida_
+
+round(sal.sexo,2)
+
+<br>
+
+* **Ejercicio 10**
+
+<br>
+
+_devuelve la distribución conjunta de las variables categoría de peso y sexo_ 
+
+dist_conj <- table(IMCin$CatPeso, IMCin$SEXO) 
+
+<br>
+
+_calculo los totales por sexo_
+
+total <- apply(dist_conj,2,sum) 
+
+<br>
+
+_calcula la distribución porcentual por sexo_
+
+dist_porc <- round(100*cbind(dist_conj[,1]/total[1],dist_conj[,2]/total[2]),2) 
+
+<br>
+
+_asigna nombre a las columnas de la distribución porcentual_
+
+colnames(dist_porc) <-c ("F(%)","M(%)") 
+
+<br>
+
+_combina ambas distribuciones_
+
+sal_conj <- cbind(dist_conj,dist_porc) 
+
+<br>
+
+_calcula el total de cada columna_
+
+Totales <- apply(sal_conj,2,sum)  
+
+<br>
+
+_agrega una fila con los totales_
+
+sal_fin <- rbind(sal_conj,Totales) 
+
+<br>
+
+_muestra la salida_
+
+sal_fin 
+
+<br>
+
+<br>
+
+## Troubleshooting 
+
+* https://stackoverflow.com/ (code)
+
+* https://stackexchange.com/ (estadística)
+
+* https://www.geeksforgeeks.org/
+
+* https://r-graph-gallery.com/
+
+
+<br>
+
+---
+
+# Visualización univariada
+
+(R base, lattice, ggplot, plotly)
+
+## Carga de base de datos
+
+R disponibiliza bases de datos (airquality, iris, titanic, etc)
+
+```{r bd}
+# Cargo la base de datos
+data(airquality)
+# Inspección rápida
+str(airquality)
+# Estadística descriptiva
+summary(airquality)
+# Vista de las primeras 4 filas
+head(airquality,4) # 6 por default
+
+# Carga de bd alojada en directorio local
+# nombre_variable_bd = read.csv('path_donde_está_bd/bd.csv',header=TRUE, sep=",")
+```
+
+## R base
+
+### Diagrama de dispersión
+```{r dispersión}
+plot(airquality$Ozone) # sinónimo de plot(airquality[['Ozone']]) - 2 maneras de acceder a la columna
+plot(airquality$Ozone, type= "b")
+plot(airquality$Ozone, type= "h")
+plot(airquality$Ozone, xlab = 'Concentración ozono', ylab = 'No de instancias', main = 'Niveles de Ozono en NY', col = 'blue')
+
+# Grafico dos variables
+plot(airquality$Ozone, xlab = 'Concentración', ylab = 'No de instancias', main = 'Niveles de Ozono/Radiación en NY', col = 'darkblue')
+points(airquality$Solar.R/20, col = 'red') # puse radiación solar dividido 20 sólo con fines ilustrativos! ¿por qué querríamos graficar los datos transformados?
+legend(130,140,c("Ozono","Radiación solar"),cex=0.7,pch=16,col=c('darkblue','red'),box.lty=0)
+
+```
+
+### Diagrama circular - plano y 3D / anidado
+
+**PLANO**
+```{r circular}
+frec_catmonth<-table(airquality$Month) # construye la distribución de frecuencias
+pie(frec_catmonth) 
+pie(frec_catmonth, col=rainbow(25, alpha=0.5),font=3, cex=1.8,radius=1,border=F,main="Gráfico de Torta") 
+
+# col= cambia la gama de colores y alpha la transparencia. "rainbow" es una paleta preeterminada 
+# font= fuente_letra
+# cex= tamaño_letra
+# radius= tamaño de torta
+# border = borde
+# main= título
+
+# Agrego etiquetas
+
+etiquetas<-c("Mayo","Junio","Julio","Agosto","Septiembre") # define etiquetas
+pct<-round(frec_catmonth/sum(frec_catmonth)*100) # calcula las frecuencias porcentuales
+etiquetas<-paste(etiquetas,pct) # agrega los porcentajes a las etiquetas 
+etiquetas<-paste(etiquetas,"%",sep="") # agrega el simbolo % a los porcentajes 
+pie(frec_catmonth,labels =etiquetas,col=heat.colors(4,alpha=0.7)) # otra manera de asignar una paleta de colores
+
+help(pie) # para ver qué otros parámetros recibe
+```
+
+**3D**
+```{r pie3d}
+# Este tipo de gráficos requiere que se carguen librerías particulares (además de las incluídas en R)
+
+# plotrix es una de ellas
+library(plotrix) 
+# Si no la tienen instalada, primero hay que instalarla con el comando "install.packages("plotrix")"
+# Ya se puede utilizar la funcion "pie3D" y darle como argumento la variable a graficar
+pie3D(frec_catmonth, labels=etiquetas,labelcex=0.9) 
+
+pie3D(frec_catmonth,labels=etiquetas,explode=0.1,labelcex=0.9,radius=1.5,height=0.2,shade=0.6,col=terrain.colors(5,alpha=1), main='Qué gráfico fachero\n(no necesariamente útil)')
+```
+**ANIDADOS**
+
+```{r pie-anidado}
+library(dplyr) # librería para manipular datos (muy útil - funciones concatenadas con "%>%")
+
+# Cambia el nombre a campos categóricos de la variable Month
+Month<-airquality%>%
+        pull(Month)%>%
+        plyr::mapvalues(c('5','6','7','8','9'),
+                        c("Mayo","Junio","Julio","Agosto","Septiembre"))
+
+# Creo una columna nueva, como para tener una variable categórica (que no tengo en la bd)
+nueva_columna <- sample(rep( c("A","B"), 154 * c(0.4,0.6) ))
+airquality$new_col <- nueva_columna
+
+airquality$Month=Month
+
+# Tabla del sector interior
+interior<-airquality%>%
+        group_by(Month)%>%
+        tally( )%>%
+        mutate(porcent_abs=round(n/sum(n)*100,2)) 
+
+
+exterior<-airquality%>%
+        group_by(Month,new_col)%>%
+        tally()%>%
+        mutate(porcent_rel=round(n/sum(n)*100,2))%>%
+        ungroup()%>%
+        mutate(porcent_abs=round(n/sum(n)*100,2))# Produce tabla del sector exterior
+
+porcent_abs_ext=exterior$porcent_abs
+tabla=table(exterior$Month)[order(unique(exterior$Month))]
+
+#Establece los colores
+colores=c("palegreen4","paleturquoise4","palevioletred4","salmon3","red")
+col_int=rep_len(colores,length(airquality$Month))
+col_ext=lapply(Map(rep,colores[seq_along(tabla)],tabla),
+               function(porcent_abs_ext){
+                 al<-head(seq(0,1,length.out=length(porcent_abs_ext)+2L)[-1L],-1L)
+                 Vectorize(adjustcolor)(porcent_abs_ext,alpha.f=al) } )
+
+plot.new() # Borra gráficos anteriores
+
+# Produce los diagramas de tortas
+torta_ext= floating.pie(0.5,0.5,exterior$porcent_abs ,
+                        radius =0.25 ,
+                        border="gray45" ,
+                        col= unlist(col_ext))
+
+torta_int= floating.pie( 0.5,0.5,interior$porcent_abs ,
+                         radius =0.2 ,
+                         border="white" ,
+                         col=col_int ) 
+
+pie.labels( x =0.5 , y =0.5 , torta_ext ,
+            paste0 ( exterior$new_col, "\n" ,
+                     exterior$porcent_rel , " % - " ,
+                     exterior$n , " ind. " ) ,
+            minangle =0.2 , radius =0.27 , 
+            cex =0.6 , font=1)# Etiqueta las regiones exteriores
+
+pie.labels( x =0.5 , y =0.5 , torta_int, 
+            paste0( interior$Month,"\n" ,
+                    interior$porcent_abs , " % - " ,
+                    interior$n , " ind. " ) ,
+            minangle =0.2 , radius =0.09 , cex =0.6 , font=1) # Etiqueta las regiones interiores
+```
+
+
+### Diagrama de barras
+```{r barras}
+barplot(airquality$Ozone, main = 'Concentración de ozono en el aire',
+        xlab = 'Niveles de ozono', col= 'blue',horiz = TRUE)
+
+par(bg="mistyrose") # background
+barplot(airquality$Ozone, main = 'Concentración de ozono en el aire',
+        xlab = 'Niveles de ozono', col= 'blue',horiz = FALSE)
+
+barplot(table(airquality$Month), main = 'Categorías de mes',
+        xlab = 'Mes', col= 'blue',horiz = FALSE)
+
+barplot(table(airquality$new_col,airquality$Month), main = 'Categorías de mes y A/B',
+        xlab = 'Mes + A/B', col= c('blue','darkblue'),horiz = FALSE)
+
+
+
+barplot(table(airquality$new_col,airquality$Month)[,c(5,1,2,4,3)], main = 'Categorías de mes y A/B',
+        xlab = 'Mes + A/B', col= c('blue','darkblue'),horiz = FALSE) # cambiando el orden de las barras
+legend("bottomright",cex=.8,title="Categoría",c("A","B"),fill=c('blue','darkblue'),horiz=F) # asigna leyendas en posición horizontal
+```
+
+### Bastones
+```{r bastones}
+Modelos<-2010:2016 # ingresa los modelos de los autos
+Ventas<-c(2,3,7,4,9,0,5) # ingresa las frecuencias de las ventas de cada modelo
+plot(Modelos,Ventas) # grafica los puntos
+
+plot(Modelos,Ventas,type="h") # grafica bastones        
+
+plot(Modelos,Ventas,type="h",lty="twodash",lwd=4,col=heat.colors(9)) #cambia el estilo y groso de la línea, y el color
+title("Ventas mensuales de una Agencia Chevrolet") 
+
+# Ahora armo el gráfico de partes - segmentos
+plot(Modelos,Ventas)
+segments(2010,0,2010,2) # agrega un segmento del punto (2010,0) al punto (2010,2)
+segments(2010,0,2010,2,lwd=3,lty="dashed",col=1) # estilo rayado
+segments(2011,0,2011,3,lwd=3,lty="dotted",col=2) # estilo punteado
+segments(2012,0,2012,7,lwd=3,lty="solid",col=3) # estilo sólido
+segments(2013,0,2013,4,lwd=3,lty="dotdash",col=4) # alterna estilos punteado y rayado
+segments(2014,0,2014,9,lwd=3,lty="twodash",col=5) # estilo doble rayado
+segments(2016,0,2016,5,lwd=3,lty="longdash",col=6) # estilo rayado largo
+
+```
+
+### Tallo de hoja
+```{r hoja}
+datos=airquality$Ozone
+
+airquality$Ozone
+
+stem(datos,scale=0.5) # da un histograma en el que se pueden apreciar los valores
+stem(datos,scale=1)
+```
+
+### Histograma
+```{r histograma}
+hist(airquality$Ozone)
+hist(airquality$Ozone, main = 'Concentración de ozono en el aire',xlab = 'Concentración de ozono',
+     ylab='Frecuencia',col='lightblue',density=18,angle=60,border="darkblue", breaks=30)
+```
+
+### Polígono de frecuencias
+
+```{r frecuencias}
+
+PESO2<-c(24.4, 23.6, 47.0, 24.0, 23.9, 41.0, 32.9, 22.4, 28.7, 31.4, 28.9, 51.2, 26.2, 58.5, 23.7, 25.5, 49.7, 39.6,42.5, 21.6, 38.0, 26.6, 20.4, 23.7, 21.4, 45.7, 51.3, 28.0, 26.9, 43.9,25.7,
+28.2,36.8,27.3,33.8,23.5,33.1,37.5,33.2,36.8,29.2,30.6,28.1,23.5,19.8,23.6,26.0,
+37.6,25.5,40.0,80.8,30.0,44.9,51.6,27.0,40.0,32.3,24.5,48.5,43.5,42.6,38.0,23.9,
+52.0,55.2,48.0,50.5,19.0,32.0,33.5,38.0,24.5,31.5,21.2,19.9,26.7,23.0,46.3,38.2,
+21.2,24.2,24.3,30.0,37.3,49.4,24.7,35.0,22.3,35.5,38.4,32.2,40.3,40.5,59.5,43.0,
+20.3,22.0,58.0,37.5,41.3,18.5,19.1,32.5,34.6,29.6,33.8,42.3,31.0,23.4,21.5,21.3,39.5,
+31.5,30.3,22.3,60.2,23.6,22.6,27.5,34.2,46.5,54.8,22.6,30.3,19.7,35.4,20.8,40.2,57.3,
+45.5,28.4,34.6,26.4,35.0,23.7,26.4,52.4,32.6,41.1,23.3,38.2,25.5,
+33.1,21.6,32.9,52.9,26.5,21.5,21.5,23.6)
+
+R=quantile(PESO2,0.75)-quantile(PESO2,0.25) # calcula el rango intercuartil
+n=length(PESO2) # guarda la cantidad de observaciones
+h.FD=2*R*n^(-1/3) # sugerencia de Freedman-Diaconis para el ancho de clase
+h.Scott=3.39*sd(PESO2)*n^(-1/3) # sugerencia de Scott para el ancho de clase
+primero=floor(min(PESO2))-1 # guarda primer valor de la grilla
+ultimo=ceiling(max(PESO2))+3 # guarda último valor de la grilla
+grilla.FD=seq(primero,ultimo,h.FD) # defino primer valor de la grilla de Freedman Diaconis
+grilla.Scott=seq(primero,ultimo,h.Scott)# defino primer valor de la grilla de Scott
+
+hist(PESO2,breaks=grilla.FD) # cambia el ancho de las columnas
+
+#----
+
+a=length(grilla.FD)
+pto.medio=rep(0,a-1) # inicia un vector
+for (i in 1:length(grilla.FD)-1){
+  pto.medio[i]=(grilla.FD[i]+grilla.FD[i+1])/2} # calcula los puntos medios de los intervalos
+alt.dens=hist(PESO2,breaks=grilla.FD,plot=F)$counts # calcula la altura correspondiente a cada punto medio
+par(mfrow=c(1,2),oma=c(0,0,2,0)) # personaliza el espacio de gráfico
+
+hist(PESO2,breaks=grilla.FD,col=heat.colors(a-1,alpha=1),
+     main="Freedman-Diaconis",
+     ylab="Frecuencia")
+points(pto.medio,alt.dens,type="l",lwd=2) # superpone el polígono de frecuencias al histograma
+
+#----
+
+b=length(grilla.Scott)
+pto.medio=rep(0,b-1)
+for (i in 1:length(grilla.Scott)-1)
+  pto.medio[i]=(grilla.Scott[i]+grilla.Scott[i+1])/2
+alt.dens=hist(PESO2,breaks=grilla.Scott,plot=F)$counts
+
+hist(PESO2,breaks=grilla.Scott,col=heat.colors(b-1,alpha=1),main="Scott",ylab="Frecuencia")
+points(pto.medio,alt.dens,type="l",lwd=2)
+mtext("Polígonos de frecuencia", outer = TRUE, cex = 1.5)
+```
+
+### Densidad
+```{r densidad}
+par(bg="white")
+dens=density(PESO2) # Kernel density estimation, es una manera no paramétrica de estimar la función de densidad de una variable aleatoria
+plot(dens,main="Densidad de Peso",xlab="Peso",ylab="Densidad") # grafica la estimación de la densidad de la variable PESO
+polygon(dens,lwd=2,col="lightblue",border="darkblue",main="Densidad de Peso") # cambia colores de relleno y borde
+
+
+
+hist(PESO2,col=cm.colors(8,alpha=1),probability=T,breaks=grilla.Scott,main="Suavizado normal",ylab="Densidad") # histograma de densidad
+xfit=seq(min(PESO2),max(PESO2),length=40) # arma una grilla de valores de datos
+yfit=dnorm(xfit,mean=mean(PESO2),sd=sd(PESO2)) # realiza un suavizado normal de datos
+lines(xfit,yfit,col="dodgerblue",lwd=2) # superpone el suavizado al histograma
+```
+
+### Fc. de distribución empírica
+```{r distribución}
+par(mfrow=c(1,2)) # dividimos el área de gráficos en dos columnas
+plot.ecdf(PESO2,col="blue",main="Peso",ylab="F(x)") # dibuja la función de distribución empírica
+plot.ecdf(TALLA,col="red",main="Talla",ylab="F(x)") 
+```
+
+### Fc. escalonada
+```{r escalonada}
+par(mfrow=c(1,1)) # unifica la pantalla de gráficos
+n=length(PESO)
+plot(stepfun(1:(n-1),sort(PESO)),main="Función escalonada") # otra manera de definir y graficar la función acumulada
+```
+
+### Boxplot
+```{r boxplot}
+muestra= airquality$Ozone[!is.na(airquality$Ozone)]
+summary(muestra)
+Md=median(muestra, na.rm=T) # variable con NAs... rompe la fc median
+Q1=quantile(muestra,0.25)
+Q3=quantile(muestra,0.75)
+DI=Q3-Q1
+Q3+1.5*DI
+Q1-1.5*DI
+Q3+3*DI
+Q1-3*DI
+
+# Valores de la función de graficación
+q1= boxplot(muestra)$stats[2,1] #Q1
+q3= boxplot(muestra)$stats[4,1] #Q3
+print(paste('q1 es',q1))
+print(paste('q3 es',q3))
+
+par(mfrow=c(1,1),col.main="aquamarine4",adj=0) # cambia el color y la posición del título
+boxplot(PESO,horizontal=T,boxcol=2, main= 'Boxplot horizontal') # colorea el borde de la caja
+
+# Múltiples box plots (univariado!!)
+
+#airquality[0:5,] # Selecciona primeras 5 filas y todas las columnas
+#airquality[0:5,0:4] # Selecciona primeras 5 filas y las primeras 4 columnas
+#airquality[,0:4] # Selecciona todas las filas y las primeras 4 columnas
+
+boxplot(airquality[,0:4], main='Múltiples boxplot\nde distintas variables', col=c('red','blue','darkred','darkblue'))
+
+par(oma=c(0,2,0,0))
+# Múltiples box plots (Bivariado: Numérica + categórica)
+boxplot(airquality$Ozone~airquality$Month, main='Boxplot de variable ozono\nen función del mes',
+        xlab= 'Concentración de ozono', ylab='',
+        col=c('red','blue','darkred','darkblue','darkgreen'), 
+        horizontal=TRUE, las=1)
+
+# Múltiples box plots (Numérica + categóricas)
+cols= c('red','red','blue','blue','darkred','darkred','darkblue','darkblue','darkgreen','darkgreen')
+cols2= c('darkred','darkblue')
+par(oma=c(0,2,0,0))
+boxplot(airquality$Ozone~airquality$new_col*airquality$Month, main='Boxplot de variable ozono\nen función del mes y A/B', xlab= 'Concentración de ozono', ylab='',col=cols, horizontal=TRUE, las=1)
+par(oma=c(0,2,0,0))
+boxplot(airquality$Ozone~airquality$new_col*airquality$Month, main='Boxplot de variable ozono\nen función del mes y A/B', xlab= 'Concentración de ozono', ylab='',col=cols2, horizontal=TRUE, notch=T, las=1)
+```
